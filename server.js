@@ -10,7 +10,7 @@ const port = 3001;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+api.use('/.netlify/functions/', router);
 // POST endpoint for form submission
 app.post('/submit-form', (req, res) => {
   // Extract data from the form submission
