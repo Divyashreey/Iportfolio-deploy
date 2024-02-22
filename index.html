@@ -759,7 +759,7 @@
             </div>
           </div>
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-          <form id="contactForm" method="post" role="form" class="php-email-form" action="https://resonant-treacle-2ef681.netlify.app" >
+          <form id="contactForm" role="form" class="php-email-form"  >
               <div class="row">
                 <div class="form-group col-md-6">
                   <label for="name">Your Name</label>
@@ -777,13 +777,6 @@
               <div class="form-group">
                 <label for="message">Message</label>
                 <textarea class="form-control" name="message" rows="10" required></textarea>
-              </div>
-              <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="error-message">Error</div>
-                
-                <div class="sent-message">Your message has been sent. Thank you!</div>
-                <div class="error-message">Error</div>
               </div>
               <input type="hidden" name="userEmail" id="userEmail" />
               <div class="text-center">
@@ -840,201 +833,39 @@
 
 
   <!-- JavaScript function for handling form submission -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const contactForm = document.getElementById('contactForm');
-  
-      contactForm.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-  
-        // Your form submission logic goes here
-  
-        // Example: Display a success message
-        const successMessage = document.querySelector('.sent-message');
-        successMessage.style.display = 'block';
-  
-        // You can also reset the form or redirect the user after successful submission
-        // contactForm.reset();
-        // window.location.replace('/thank-you');
-      });
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.3/dist/email.min.js"></script>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+
+    contactForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(contactForm);
+      const templateParams = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        subject: formData.get('subject'),
+        message: formData.get('message')
+      };
+
+      emailjs.send("service_6wde5dm", "template_5zm7kko", templateParams, "HZWHMAGXrltuIc3-H")
+        .then(function(response) {
+          console.log("Email sent successfully:", response);
+          // Show success message
+          document.querySelector('.sent-message').style.display = 'block';
+          // Clear form fields
+          contactForm.reset();
+        }, function(error) {
+          console.error("Error sending email:", error);
+          // Show error message
+          document.querySelector('.error-message').style.display = 'block';
+        });
     });
-  </script>
-  <!-- Inside your script tag or external JavaScript file -->
-<script>
-  // Define the submitForm function
-  function submitForm(event) {
-  event.preventDefault(); // Prevent the default form submission behavior
-
-  // Assuming you have form data to send
-  const formData = new FormData(event.target);
-
-  // Use Fetch API to send a POST request to the server
-  fetch('https://resonant-treacle-2ef681.netlify.app', {
-    method: 'POST',
-    body: formData,
-  })
-    .then(response => response.json())  // Assuming the server responds with JSON
-    .then(data => {
-      // Handle the response data here
-      console.log('Server response:', data);
-
-      // You can update the UI or display a message based on the response
-      alert('Form submitted successfully!');
-    })
-    .catch(error => {
-      console.error('Error submitting form:', error);
-      alert('Error submitting form. Please try again.');
-    });
-}
-
-</script>
-<!-- Add the following script within the <head> or at the end of the <body> in your HTML file -->
-  <style>
-    .loading {
-      display: none;
-    }
-  </style>
-  <!-- Include the script at the end of the body section -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const contactForm = document.getElementById('contactForm');
-      const loadingContainer = document.querySelector('.loading');
-      const errorContainer = document.querySelector('.error-message');
-      const sentMessageContainer = document.querySelector('.sent-message');
-
-      contactForm.addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          // Reset previous messages
-          loadingContainer.style.display = 'block';
-          errorContainer.style.display = 'none';
-          sentMessageContainer.style.display = 'none';
-
-          try {
-              const formData = new FormData(contactForm);
-              const responseData = await fetch('https://resonant-treacle-2ef681.netlify.app', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: new URLSearchParams(formData),
-              });
-
-              if (!responseData.ok) {
-                  throw new Error('Server error');
-              }
-
-              const responseJson = await responseData.json();
-              console.log(responseJson);
-
-              // Display success message
-              sentMessageContainer.style.display = 'block';
-          } catch (error) {
-              console.error('Error submitting form:', error);
-
-              // Optionally log the error to the server or take other actions
-
-              // You can choose not to display any error messages to the user
-          } finally {
-              // Hide loading indicator after the request is complete
-              loadingContainer.style.display = 'none';
-          }
-      });
   });
+  
 </script>
-
-  <!-- <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const contactForm = document.getElementById('contactForm');
-      const loadingIndicator = document.querySelector('.loading');
-  
-      contactForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-  
-        try {
-          // Show the loading indicator
-          loadingIndicator.style.display = 'block';
-  
-          const formData = new FormData(contactForm);
-          const responseData = await fetch('http://localhost:3001/submit-form', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(formData),
-          });
-  
-          if (!responseData.ok) {
-            throw new Error('Form submission failed');
-          }
-  
-          const jsonResponse = await responseData.json();
-          console.log(jsonResponse);
-  
-          // Hide the loading indicator on successful submission
-          loadingIndicator.style.display = 'none';
-        } catch (error) {
-          console.error('Error during form submission:', error);
-          // Hide the loading indicator on error
-          loadingIndicator.style.display = 'none';
-        }
-      });
-    });
-  </script> -->
-  <script>
-    document.getElementById('email').onchange = function() {
-      // Set the value of the hidden input field to the user's email
-      document.getElementById("userEmail").value = this.value;
-    };
-//     const responseData = await fetch('http://localhost:3001/submit-form', {
-//   method: 'POST',
-//   headers: {
-//     'Content-Type': 'application/json', // Change this if needed
-//   },
-//   body: JSON.stringify(Object.fromEntries(formData)),
-// });
-  </script>
-  <!-- Include the script at the end of the body section -->
-<!-- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const contactForm = document.getElementById('contactForm');
-      const errorContainer = document.querySelector('.error-message');
-
-      contactForm.addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          // Reset previous error message
-          errorContainer.textContent = '';
-
-          try {
-              const formData = new FormData(contactForm);
-              const responseData = await fetch('http://localhost:3001/submit-form', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: new URLSearchParams(formData),
-              });
-
-              if (!responseData.ok) {
-                  throw new Error('Server error');
-              }
-
-              const responseJson = await responseData.json();
-              console.log(responseJson);
-
-              // Display success message
-              const sentMessageContainer = document.querySelector('.sent-message');
-              sentMessageContainer.style = 'block';
-          } catch (error) {
-              console.error('Error submitting form:', error);
-              
-              // Display a generic error message
-              errorContainer.textContent = 'An error occurred. Please try again later.';
-          }
-      });
-  });
-</script> -->
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 
 </body>
 
